@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.trippoapp.model.ModelClass;
+
 public class SigninActivity extends AppCompatActivity {
 
     EditText email, password;
@@ -39,20 +41,36 @@ public class SigninActivity extends AppCompatActivity {
                     Toast.makeText(SigninActivity.this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    ModelClass modelClass = new ModelClass("", mail, "", pass, null);
+                    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(mail).matches()){
+                        Toast.makeText(SigninActivity.this, "Invalid email", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    ModelClass modelClass = new ModelClass("", mail, "", pass);
                     Boolean result = myDB.checkusernamepass(modelClass);
-                    if (result){
+                    if (mail.equals("admin@gmail.com") || pass.equals("admin123")){
                         sp = getSharedPreferences("MyPref", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putString("id",mail);
+                        editor.putString("id1",mail);
                         editor.apply();
 
-                        Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), AdminActivity.class);
                         startActivity(intent);
                     }
                     else {
-                        Toast.makeText(SigninActivity.this, "Invalid Credential", Toast.LENGTH_SHORT).show();
+                        if (result){
+                            sp = getSharedPreferences("MyPref", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putString("id",mail);
+                            editor.apply();
+
+                            Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
+                            startActivity(intent);
+                        }
+                        else {
+                            Toast.makeText(SigninActivity.this, "Invalid Credential", Toast.LENGTH_SHORT).show();
+                        }
                     }
+
                 }
             }
         });
